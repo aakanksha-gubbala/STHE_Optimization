@@ -19,7 +19,7 @@ def main():
     T_s_in = a1.number_input("Hot fluid inlet temperature", format="%.2f", value=135.00)
     T_t_in = a2.number_input("Cold fluid inlet temperature", format="%.2f", value=30.00)
     T_s_out = b1.number_input("Hot fluid outlet temperature", format="%.2f", value=40.00)
-    T_t_out = b2.number_input("Cold fluid outlet temperature", format="%.2f", value=45.00)
+    T_t_out = b2.number_input("Cold fluid outlet temperature", format="%.2f", value=42.00)
     m_s = c1.number_input("Hot fluid flow rate in kg/s", format="%.3f", value=0.579)
     sthe = STHE()
     sthe.T_s_in = T_s_in
@@ -50,8 +50,8 @@ def main():
     new.C_tb = sol_array[5]
     new.baffle_cut = sol_array[6]
     new.Costing()
-    c2.write("Cold fluid flow rate in kg/s")
-    c2.write("%0.3f kg/h" % (sthe.m_t))
+    c2.write("Cold fluid flow rate")
+    c2.write("%0.3f kg/s" % (sthe.m_t))
     st.success("Optimized design parameters")
     col1, col2 = st.beta_columns(2)
     col2.info("Tube side")
@@ -61,6 +61,7 @@ def main():
     col2.write(r"Tube length = %.1f m" % sol["L"])
     col2.write(r"Outer diameter of tube = %.2f mm" % (sol["do"] * 1e3))
     col2.write(r"$\Delta P$ on shell side = %.1f Pa" % sol["dPs"])
+    col2.write(r"Tube-side h = %.2f W/(m$^2$K)" % new.hi)
     col2.write(r"Tube and baffle spacing = %.2f mm" % (sol["C_tb"] * 1e3))
     col2.write(r"Number of tubes = %.0f" % new.Nt)
     col1.write(r"Diameter of shell = %.2f mm" % (new.Ds * 1e3))
@@ -68,6 +69,7 @@ def main():
     col1.write(r"Baffle spacing = %.2f mm" % (new.baffle_spacing * 1e3))
     col1.write(r"Baffle cut = %.0f%%" % (sol["baffle_cut"] * 100))
     col1.write(r"$\Delta P$ on tube side = %.1f Pa" % sol["dPt"])
+    col1.write(r"Shell-side h = %.2f W/(m$^2$K)" % new.ho)
     st.success(r"Total cost = $%.2f/year" % sol["total_cost"])
     st.write(r"Calculated overall heat transfer coefficient = %.1f W/(m$^2$K)" % sol["Ucalculated"])
     st.write(r"Area required = %.2f m$^2$" % sol["A_calc"])
