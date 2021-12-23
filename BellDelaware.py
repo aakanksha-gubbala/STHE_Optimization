@@ -6,10 +6,10 @@ import theory
 
 np.seterr(divide='ignore', invalid='ignore')
 
-PAGES = {"Home": ref, "Theory": theory}
+PAGES = {"Home": ref, "About": theory}
 
 st.sidebar.title("Navigation")
-selection = st.sidebar.radio("Go to", ["Home", "Theory"])
+selection = st.sidebar.radio("Go to", ["Home", "About"])
 
 with st.spinner(f'Loading {selection} ...'):
     PAGES[selection].main()

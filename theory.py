@@ -2,7 +2,6 @@ import streamlit as st
 
 
 def main():
-    st.title("STHE Classes")
     st.subheader("Problem Solving Approach")
     st.image('diagram.png')
     st.write("Objective : Minimize total cost of STHE")

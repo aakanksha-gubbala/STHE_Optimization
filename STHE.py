@@ -236,11 +236,10 @@ class STHE:
         df_constrained = df[
             (1.1 * df["dPs"] < self.dPs_perm) &
             (1.1 * df["dPt"] < self.dPt_perm) &
-            ((df["A_calc"] < df["A"])) &
+            ((1.03 * df["A_calc"] < df["A"])) &
             (df["Uerr"] > 0) &
             (df["Uerr"] < 10)]
-        self.solution = df_constrained[df_constrained["total_cost"] == df_constrained["total_cost"].max()]
-
+        self.solution = df_constrained[df_constrained["total_cost"] == df_constrained["total_cost"].min()]
 
 # sthe = STHE()
 # sthe.Costing()

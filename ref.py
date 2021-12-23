@@ -52,7 +52,7 @@ def main():
     new.Costing()
     c2.write("Cold fluid flow rate")
     c2.write("%0.3f kg/s" % (sthe.m_t))
-    st.success("Optimized design parameters")
+    st.success("Optimized variables")
     col1, col2 = st.beta_columns(2)
     col2.info("Tube side")
     col1.error("Shell side")
