@@ -10,7 +10,7 @@ def main():
     st.write(r"2. $\Delta P_t < \Delta P_{t, permissible}$")
     st.write(r"3. $A_{calc} < A_{required}$")
     st.write("Subject to variables : ")
-    st.write(r"1. Tube layout = [Traingular 30$^o$, Rotated square 45$^o$, Square 90$^o$]")
+    st.write(r"1. Tube layout = [Triangular 30 deg, Rotated square 45 deg, Square 90 deg]")
     st.write(r"2. Number of tube passes = [1, 2, 4]")
     st.write(r"3. Baffle cut = 15% to 25%")
     st.write(r"4. Length of tube = 2.5 to 6 m")
