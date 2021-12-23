@@ -16,7 +16,7 @@ def main():
     c1, c2 = st.beta_columns(2)
     x1.write("Hot ethylbenzene: Shell side")
     x2.write("Cold water: Tube side")
-    T_s_in = a1.number_input("Hot fluid inlet temperature", format="%.2f", value=135.00)
+    T_s_in = a1.number_input("Hot fluid inlet temperature", format="%.2f", value=125.00)
     T_t_in = a2.number_input("Cold fluid inlet temperature", format="%.2f", value=30.00)
     T_s_out = b1.number_input("Hot fluid outlet temperature", format="%.2f", value=40.00)
     T_t_out = b2.number_input("Cold fluid outlet temperature", format="%.2f", value=42.00)
