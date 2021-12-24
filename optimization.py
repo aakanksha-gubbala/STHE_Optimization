@@ -9,11 +9,9 @@ L = np.arange(2.5, 6.0 + 0.5, 0.5)
 do = np.array([0.75, 1, 1.25, 1.5, 2]) * 0.0254
 # BWG = np.arange(7, 16 + 1, 1)
 # di = do - 2 * getBWG(BWG) * 1e-3
-C_sb = 1e-3 * np.array([5, 10, 15, 20, 25])
-C_tb = 1e-3 * np.array([5, 10, 15, 20, 25])
+C_sb = 1e-3 * np.array([1, 2, 3, 4, 5])
+C_tb = 1e-3 * np.array([1, 2, 3, 4, 5])
 baffle_cut = 1e-2 * np.arange(15, 25 + 5, 5)
-
-
 # baffle_spacing_factor = np.arange(0.1, 0.5 + 0.1, 0.1)
 
 # def costFunc(X):

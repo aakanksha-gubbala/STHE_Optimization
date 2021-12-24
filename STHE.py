@@ -4,6 +4,11 @@ import pandas as pd
 from optimization import *
 
 
+#### Multivariable optimization for design of STHEs
+#### Uses Bell-Delaware method for calculation of heat transfer coefficients
+#### Uses discrete optimization method
+
+
 def getReClasses(Re):
     i = 0
     if Re >= 1e4 and Re <= 1e5:
@@ -22,6 +27,11 @@ def getReClasses(Re):
 
 
 def getColburnCoeffs(i, tube_layout):
+    # Colburn coefficients for different tube layouts
+    # Depends on magnitude of Reynolds number (cases 1 to 5)
+    # values = [a1, a2, a3, a4, b1, b2, b3, b4]
+    # a1 to a4 are for calulation of J factors for shell-side heat transfer coefficient
+    # b1 to b4 are for calculation of shell-side pressure drop
     if tube_layout == 30:
         switcher = {
             1: [0.321, -0.388, 1.450, 0.519, 0.372, -0.123, 7.00, 0.500],
@@ -66,6 +76,7 @@ def getBWG(i):
 
 
 def F_EvenTube(NP, R, S):
+    # Multipass correction factors for even number of tubes
     F_even = np.sqrt((R ** 2 + 1) * np.log((1 - S) / (1 - R * S))) / (
             (R - 1) * np.log((2 - S * (R + 1 - np.sqrt(R ** 2 + 1))) / (2 - S * (R + 1 + np.sqrt(R ** 2 + 1)))))
     switcher = {
@@ -77,6 +88,7 @@ def F_EvenTube(NP, R, S):
 
 
 def get_Dbt_params(NP, tube_layout):
+    # Tube bundle diameter correlations
     if tube_layout == 30:
         switcher = {
             1: [0.319, 2.142],
@@ -93,6 +105,7 @@ def get_Dbt_params(NP, tube_layout):
 
 
 def getA_cr(self):
+    # Area in crossflow
     if self.tube_layout == 30:
         A_cr = self.baffle_spacing * (self.Ds - self.Dbt + ((self.Dbt - self.do) / self.pt) * (self.pt - self.do))
     elif self.tube_layout == 45:
@@ -111,7 +124,7 @@ class STHE:
         # Units of Cp is kJ/kg/K
         # Units of density (rho) is kg/m^3
         # Units of viscosity (mu) = Pa.s
-        # Thermal conductivity, U, h have SI units
+        # Thermal conductivity, U, h, fouling resistances have SI units
         # Pressure is in Pa
         self.T_s_in = 135
         self.T_t_in = 30
@@ -249,7 +262,7 @@ class STHE:
         # Pump power = dP * flow-rate = to pump liquid through the module
         self.pump_power = (self.dPt_calc * self.m_t / self.rho_t + self.dPs_calc * self.m_s / self.rho_s) / 0.85
         # Correlations for costing of bare STHE module
-        CP = np.power(10, 3.2138 + 0.2688 * np.log10(self.A_calc) + 0.07961 * (np.log10(self.A_calc)) ** 2)
+        CP = np.power(10, 3.2138 + 0.2688 * np.log10(self.A_actual) + 0.07961 * (np.log10(self.A_actual)) ** 2)
         CBM = CP * (1.8 + 1.5 * 1.7)
         # Operating power = (pump power) * (electricity cost) * (operating hours per year ~ 49 weeks)
         self.OC = 8232 * self.pump_power * 0.1e-3
@@ -261,6 +274,7 @@ class STHE:
         # Discrete optimization method
         df = getDataFrame(self)
         df["Uerr"] = (1 - df["Ucalculated"] / self.U) * 100
+        # Applied constraints on the dataset
         df_constrained = df[
             (1.1 * df["dPs"] < self.dPs_perm) &
             (1.1 * df["dPt"] < self.dPt_perm) &
