@@ -105,6 +105,14 @@ def getA_cr(self):
 
 class STHE:
     def __init__(self):
+        # All temperatures in deg C
+        # All units of length is m
+        # All units of power and energy are SI units
+        # Units of Cp is kJ/kg/K
+        # Units of density (rho) is kg/m^3
+        # Units of viscosity (mu) = Pa.s
+        # Thermal conductivity, U, h have SI units
+        # Pressure is in Pa
         self.T_s_in = 135
         self.T_t_in = 30
         self.T_s_out = 40
@@ -134,12 +142,15 @@ class STHE:
         self.Rt = 3.01e-4
 
     def Initialize(self):
+        # Energy balances to find mass flow rate of cold stream
         self.Q = self.m_s * self.Cp_s * (self.T_s_in - self.T_s_out)
         self.m_t = self.m_s * self.Cp_s * (self.T_s_in - self.T_s_out) / (
                 self.Cp_t * (self.T_t_out - self.T_t_in))
         self.lmtd = ((self.T_s_in - self.T_t_out) - (self.T_s_out - self.T_t_in)) / np.log(
             (self.T_s_in - self.T_t_out) / (self.T_s_out - self.T_t_in))
         self.A_assumed = self.Q / (self.U * self.lmtd)
+
+        # Mechanical design = number of tubes, shell diameter, tube bundle diameter, baffle spacing
         self.Nt_calc = np.ceil(self.A_assumed / (np.pi * self.do * self.L))
         if self.NP == 1:
             self.Nt = self.Nt_calc
@@ -152,6 +163,13 @@ class STHE:
         self.baffle_spacing = self.baffle_spacing_factor * self.Ds
 
         # Shell side heat transfer
+        # ho = h_{ideal} * Jc * Jl * Jb
+        # Get Js from Colburn coefficients - dependent on magnitude of Reynolds number
+        # J = f(a1, a2, a3, a4)
+        # Bell-Delaware method accounts for -
+        # a) leakage between tubes & baffle and shell & baffle
+        # b) bypass of flow between tube bundle and shell
+        # c) baffle configuration (only a fraction of tubes are in cross-flow)
         A_cr = getA_cr(self)
         self.Pr_s = self.Cp_s * self.mu_s / self.k_s
         self.Re_s = self.m_s * self.do / (self.mu_s * A_cr)
@@ -197,6 +215,7 @@ class STHE:
         self.U_calc = 1 / (1 / self.ho + (self.do / self.di) / self.hi + self.Rs + self.Rt * (self.do / self.di))
 
         # Area Calculations
+        # Multi-pass correction factor = F = from correlations
         self.R = (self.T_s_in - self.T_s_out) / (self.T_t_out - self.T_t_in)
         self.S = (self.T_t_out - self.T_t_in) / (self.T_s_in - self.T_t_in)
         self.F = F_EvenTube(self.NP, self.R, self.S)
@@ -204,6 +223,7 @@ class STHE:
         self.A_actual = np.pi * self.do * self.L * self.Nt
 
         # Shell side pressure drop
+        # dP = from correlations = f(b1, b2, b3, b4)
         b = b3_s / (1 + 0.14 * self.Re_s ** b4_s)
         Ncw = 0.8 * Lc / ptp
         A_w = 0.24 * self.Ds ** 2 * (np.arccos((self.Ds - 2 * Lc) / self.Ds) - ((self.Ds - 2 * Lc) / self.Ds) * np.sqrt(
@@ -217,20 +237,28 @@ class STHE:
         self.dPs_calc = ((Nb - 1) * dPs_bid + Nb * dPs_wid) * zeta_l + 4 * dPs_bid * (1 + Ncw / Nc) * zeta_b
 
         # Tube side pressure drop
+        # dP = 2 * Np * f * L * G^2 / (rho * di)
         ft = 0.046 * np.power(self.Re_t, -0.2)
         self.dPt_calc = 0.5 * self.NP * (ft * self.L / self.di) * np.power(self.NP * self.m_t / (self.Nt * self.At),
                                                                            2) / self.rho_t
 
     def Costing(self):
+        # Shell = carbon steel
+        # Tube = stainless steel
         self.Initialize()
+        # Pump power = dP * flow-rate = to pump liquid through the module
         self.pump_power = (self.dPt_calc * self.m_t / self.rho_t + self.dPs_calc * self.m_s / self.rho_s) / 0.85
+        # Correlations for costing of bare STHE module
         CP = np.power(10, 3.2138 + 0.2688 * np.log10(self.A_calc) + 0.07961 * (np.log10(self.A_calc)) ** 2)
         CBM = CP * (1.8 + 1.5 * 1.7)
+        # Operating power = (pump power) * (electricity cost) * (operating hours per year ~ 49 weeks)
         self.OC = 8232 * self.pump_power * 0.1e-3
+        # Annuities paid per year : interest/year is 5% and lifetime of STHE is assumed to be 10 years
         i = 0.05
         self.TC = CBM * (i * (1 + i) ** 10) / ((1 + i) ** 10 - 1) + self.OC
 
     def Optimize(self):
+        # Discrete optimization method
         df = getDataFrame(self)
         df["Uerr"] = (1 - df["Ucalculated"] / self.U) * 100
         df_constrained = df[
@@ -240,6 +268,7 @@ class STHE:
             (df["Uerr"] > 0) &
             (df["Uerr"] < 10)]
         self.solution = df_constrained[df_constrained["total_cost"] == df_constrained["total_cost"].min()]
+        self.solution_max = df_constrained[df_constrained["total_cost"] == df_constrained["total_cost"].max()]
 
 # sthe = STHE()
 # sthe.Costing()

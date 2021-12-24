@@ -4,6 +4,7 @@ import streamlit as st
 def main():
     st.subheader("Problem Solving Approach")
     st.image('diagram.png')
+    st.image('optim-schematic.png')
     st.write("Objective : Minimize total cost of STHE")
     st.write("Constraints : ")
     st.write(r"1. $\Delta P_s < \Delta P_{s, permissible}$")
