@@ -121,7 +121,7 @@ class STHE:
         # All temperatures in deg C
         # All units of length is m
         # All units of power and energy are SI units
-        # Units of Cp is kJ/kg/K
+        # Units of Cp is J/kg/K
         # Units of density (rho) is kg/m^3
         # Units of viscosity (mu) = Pa.s
         # Thermal conductivity, U, h, fouling resistances have SI units
