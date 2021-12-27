@@ -68,33 +68,16 @@ def main():
             name = "Triangular"
         return name
 
-    new = STHE()
-    new.T_s_in = T_s_in
-    new.T_t_in = T_t_in
-    new.T_s_out = T_s_out
-    new.T_t_out = T_t_out
-    new.Cp_s = Cp_s * 1e3
-    new.Cp_t = Cp_t * 1e3
-    new.rho_s = rho_s
-    new.rho_t = rho_t
-    new.mu_s = mu_s * 1e-3
-    new.mu_t = mu_t * 1e-3
-    new.k_s = k_s
-    new.k_t = k_t
-    new.Rs = Rs
-    new.Rt = Rt
-    new.U = U
-    new.m_s = m_s
-    new.tube_layout = sol_array[0]
-    new.NP = sol_array[1]
-    new.L = sol_array[2]
-    new.do = sol_array[3]
-    new.C_sb = sol_array[4]
-    new.C_tb = sol_array[5]
-    new.baffle_cut = sol_array[6]
-    new.Costing()
+    sthe.tube_layout = sol_array[0]
+    sthe.NP = sol_array[1]
+    sthe.L = sol_array[2]
+    sthe.do = sol_array[3]
+    sthe.C_sb = sol_array[4]
+    sthe.C_tb = sol_array[5]
+    sthe.baffle_cut = sol_array[6]
+    sthe.Costing()
     c2.write("Tube-side fluid flow rate")
-    c2.write("%0.3f kg/s" % (new.m_t))
+    c2.write("%0.3f kg/s" % (sthe.m_t))
     st.success("Optimized variables")
     col1, col2 = st.beta_columns(2)
     col2.info("Tube side")
@@ -104,19 +87,17 @@ def main():
     col2.write(r"Tube length = %.1f m" % sol["L"])
     col2.write(r"Outer diameter of tube = %.2f mm" % (sol["do"] * 1e3))
     col2.write(r"$\Delta P$ on shell side = %.1f Pa" % sol["dPs"])
-    col2.write(r"Tube-side h = %.2f W/(m$^2$K)" % new.hi)
+    col2.write(r"Tube-side h = %.2f W/(m$^2$K)" % sthe.hi)
     col2.write(r"Tube and baffle spacing = %.2f mm" % (sol["C_tb"] * 1e3))
-    col2.write(r"Number of tubes = %.0f" % new.Nt)
-    col1.write(r"Diameter of shell = %.2f mm" % (new.Ds * 1e3))
+    col2.write(r"Number of tubes = %.0f" % sthe.Nt)
+    col1.write(r"Diameter of shell = %.2f mm" % (sthe.Ds * 1e3))
     col1.write(r"Shell and baffle spacing = %.2f mm" % (sol["C_sb"] * 1e3))
-    col1.write(r"Baffle spacing = %.2f mm" % (new.baffle_spacing * 1e3))
+    col1.write(r"Baffle spacing = %.2f mm" % (sthe.baffle_spacing * 1e3))
     col1.write(r"Baffle cut = %.0f%%" % (sol["baffle_cut"] * 100))
     col1.write(r"$\Delta P$ on tube side = %.1f Pa" % sol["dPt"])
-    col1.write(r"Shell-side h = %.2f W/(m$^2$K)" % new.ho)
+    col1.write(r"Shell-side h = %.2f W/(m$^2$K)" % sthe.ho)
     st.success(r"Total cost = $%.2f/year" % sol["total_cost"])
     i2.write(r"Calculated overall heat transfer coefficient")
     i2.write(r"%.1f W/(m$^2$K)" % sol["Ucalculated"])
     st.write(r"Area required = %.2f m$^2$" % sol["A_calc"])
     st.write(r"Area available = %.2f m$^2$" % sol["A"])
-
-
